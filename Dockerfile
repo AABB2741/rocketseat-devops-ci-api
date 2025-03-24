@@ -1,19 +1,25 @@
-FROM node:20-slim AS base
+FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
-COPY . /usr/src/app
-WORKDIR /usr/src/app
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+WORKDIR /usr/src/app
+COPY . .
+
+# ----------
 
 FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
 
-FROM base
-COPY --from=prod-deps /usr/src/app/node_modules /usr/src/app/node_modules
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+RUN pnpm prune --prod
+
+# ----------
+
+FROM base AS deploy
+
+RUN pnpm install -g @nestjs/cli
+COPY --from=build /usr/src/app/node_modules /usr/src/app/node_modules
 COPY --from=build /usr/src/app/dist /usr/src/app/dist
-EXPOSE 8000
+EXPOSE 3000
 CMD [ "pnpm", "start" ]

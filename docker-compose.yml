@@ -1,9 +1,7 @@
-version: "3.7"
-
 services:
-  mysql:
+  database:
     image: mysql:8
-    container_name: mysql
+    container_name: database
     volumes:
       - db:/var/lib/mysql
     ports:
@@ -23,13 +21,12 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - mysql
+      - database
     networks:
       - primeira-network
 
 networks:
   primeira-network:
-    name: primeira-network
     driver: bridge
 
 volumes:
