@@ -45,4 +45,4 @@ jobs:
         run: docker build -t aabbb2741/rocketseat-devops-ci-api:${{ steps.generate_tag.outputs.sha }} .
 
       - name: Push image
-        run: docker push aabbb2741/rocketseat-devops-ci-api:${{ steps.generate_tag.outputs.sha }} .
+        run: docker push aabbb2741/rocketseat-devops-ci-api:${{ steps.generate_tag.outputs.sha }}
